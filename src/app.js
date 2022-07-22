@@ -10,6 +10,10 @@ const app = express();
 
 //Routers
 const { usersRouter } = require('./routes/users.routes');
+const { artistsRouter } = require('./routes/artists.routes');
+const { albumsRouter } = require('./routes/albums.routes');
+const { songsRouter } = require('./routes/songs.routes');
+const { favoriteSongsRouter } = require('./routes/favoriteSongs.routes');
 
 //utils
 const { globalErrorHandler } = require('./utils/globalError');
@@ -43,6 +47,10 @@ else app.use(morgan('combined'));
 
 //invocate routes
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/artists", artistsRouter);
+app.use("/api/v1/artists", albumsRouter);
+app.use("/api/v1/songs", songsRouter);
+app.use("/api/v1/songs", favoriteSongsRouter);
 
 
 app.all('*',(req,res,next)=>{

@@ -14,8 +14,7 @@ const Songs = dbConnect.define('songs', {
     },
     albumId: {
         type: DataTypes.INTEGER,
-        allowNull: false,
-        unique:true
+        allowNull: false
     },
     status: {
         type: DataTypes.STRING,

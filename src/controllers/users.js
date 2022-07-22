@@ -8,6 +8,9 @@ const { Users } = require('../models/users');
 const { catchAsync } = require('../utils/catchAsync');
 const { AppError } = require('../utils/appError');
 const { Email } = require('../utils/email');
+const { Albums } = require('../models/albums');
+const { Artists } = require('../models/artists');
+const { Songs } = require('../models/songs');
 
 //controllers
 const signUp = catchAsync(async (req,res,next)=>{
@@ -89,6 +92,45 @@ const deleted = catchAsync(async (req,res,next)=>{
 
     await user.update({ status: 'delete' });
 
+    const artist = await Artists.findOne({
+        where: {
+            userId: user.id,
+            status: 'active'
+        }
+    });
+
+    await artist.update({
+        status: 'delete'
+    })
+
+    const albums = await Albums.findAll({
+        where: {
+            artistId: artist.id,
+            status: 'active'
+        }
+    });
+
+    const promises = albums.map(async album=>{
+        album.update({
+            status: 'delete'
+        });
+
+        const songs = await Songs.findAll({
+            where: {
+                albumId: album.id,
+                status: 'active'
+            }
+        });
+
+        songs.map(song=>{
+            song.update({
+                status: 'delete'
+            });
+        });
+    });
+
+    await Promise.all(promises);
+
     res.status(201).json({ status: 'success' });
 });
 
@@ -97,6 +139,7 @@ const getItems = catchAsync(async (req,res,next)=>{
         where: {
             status: 'active'
         },
+        attributes: { exclude: ['password','status'] }
     });
 
     if (!data.length) {
